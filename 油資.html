@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> 品保油資計算機</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); width: 100%; max-width: 380px; }
+        h2 { color: #1a1a1a; text-align: center; margin-bottom: 25px; font-size: 22px; }
+        .input-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 8px; color: #555; font-size: 14px; font-weight: 500; }
+        input { width: 100%; padding: 12px; border: 1px solid #e1e4e8; border-radius: 10px; box-sizing: border-box; font-size: 16px; background-color: #fdfdfd; transition: border 0.3s; }
+        input:focus { border-color: #3498db; outline: none; background-color: #fff; }
+        .result-section { margin-top: 25px; padding: 20px; border-radius: 12px; background-color: #f8f9fa; border: 1px solid #edf2f7; }
+        .result-item { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: #4a5568; }
+        .profit-container { margin-top: 15px; padding-top: 15px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .profit-label { font-weight: bold; font-size: 18px; color: #2d3748; }
+        .profit-value { color: #2ecc71; font-weight: 800; font-size: 24px; }
+        .unit { font-size: 14px; color: #a0aec0; margin-left: 4px; }
+        .footer-note { font-size: 12px; color: #a0aec0; text-align: center; margin-top: 20px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🚗 通勤補貼計算機</h2>
+    
+    <div class="input-group">
+        <label>當月總趟數 (單程 17.6km)</label>
+        <input type="number" id="trips" value="11" oninput="calculate()">
+    </div>
+    
+    <div class="input-group">
+        <label>目前 92 油價 (元/公升)</label>
+        <input type="number" id="oilPrice" value="30.7" step="0.1" oninput="calculate()">
+    </div>
+
+    <div class="input-group">
+        <label>機車平均油耗 (km/L)</label>
+        <input type="number" id="efficiency" value="40" step="0.5" oninput="calculate()">
+    </div>
+
+    <div class="result-section">
+        <div class="result-item">
+            <span>總里程:</span>
+            <span><strong id="totalKm">0</strong><span class="unit">km</span></span>
+        </div>
+        <div class="result-item">
+            <span>預估總補貼:</span>
+            <span><strong id="subsidy">0</strong><span class="unit">元</span></span>
+        </div>
+        <div class="result-item">
+            <span>實際油錢支出:</span>
+            <span><strong id="cost">0</strong><span class="unit">元</span></span>
+        </div>
+        
+        <div class="profit-container">
+            <span class="profit-label">本月淨賺:</span>
+            <span class="profit-value">$<span id="netProfit">0</span></span>
+        </div>
+    </div>
+    
+    <p class="footer-note">
+        計算基準：單次 17.6 公里 / 補貼 1.5 元/km<br>
+        (淨賺金額已扣除實際油資支出)
+    </p>
+</div>
+
+<script>
+function calculate() {
+    // 固定公司參數
+    const distancePerTrip = 17.6;
+    const subsidyPerKm = 1.5;
+
+    // 取得使用者輸入值
+    const trips = parseFloat(document.getElementById('trips').value) || 0;
+    const oilPrice = parseFloat(document.getElementById('oilPrice').value) || 0;
+    const fuelEfficiency = parseFloat(document.getElementById('efficiency').value) || 1; // 避免除以0
+
+    // 邏輯計算
+    const totalKm = trips * distancePerTrip;
+    const subsidy = totalKm * subsidyPerKm;
+    const fuelUsed = totalKm / fuelEfficiency;
+    const cost = fuelUsed * oilPrice;
+    const netProfit = subsidy - cost;
+
+    // 更新介面 (四捨五入到整數，畫面比較乾淨)
+    document.getElementById('totalKm').innerText = totalKm.toFixed(1);
+    document.getElementById('subsidy').innerText = Math.round(subsidy);
+    document.getElementById('cost').innerText = Math.round(cost);
+    document.getElementById('netProfit').innerText = Math.round(netProfit);
+}
+
+// 啟動時先算一次
+calculate();
+</script>
+
+</body>
+</html>
